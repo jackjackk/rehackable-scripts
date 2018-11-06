@@ -86,7 +86,7 @@ function download {
 
 # $RET - Match(es)
 function rmtgrep {
-  RET="$(ssh root@10.11.99.1 "grep -$1 '$2' $3")"
+  RET="$(ssh root@$SSH_ADDRESS "grep -$1 '$2' $3")"
 }
 
 # Recursively Search File(s)
