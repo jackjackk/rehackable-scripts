@@ -55,7 +55,7 @@ function exit_failed {
 
 # $RET_MATCH - Match(es)
 function rmtgrep {
-  RET_MATCH="$(ssh -S remarkable-ssh root@"$SSH_ADDRESS" "grep -$1 '$2' $3")"
+  RET_MATCH="$(ssh -S remarkable-ssh root@"$SSH_ADDRESS" "/bin/grep -$1 '$2' $3")"
 }
 
 # Downloads document trough the webui
@@ -102,7 +102,7 @@ function download {
 # $? - 1: Success | 0: Directory Empty
 function download_dir {
 
-  rmtgrep "lF" "\"parent\": \"$3\"" "/home/root/.local/share/remarkable/xochitl/*.metadata"
+  rmtgrep "il" "\"parent\": \"$3\"" "/home/root/.local/share/remarkable/xochitl/*.metadata"
   child_metadata="$RET_MATCH"
 
   if [ -z "$child_metadata" ]; then
@@ -174,7 +174,8 @@ function find_document {
 
   RET_FOUND=()
 
-  rmtgrep "lF" "\"visibleName\": \"${_PATH[$3]}\"" "/home/root/.local/share/remarkable/xochitl/*.metadata"
+  rmtgrep "ile" "\"visibleName\": \".*${_PATH[$3]}.*\"" "/home/root/.local/share/remarkable/xochitl/*.metadata"
+  echo $RET_MATCH
   matches_by_name="$RET_MATCH"
 
   for metadata_path in $matches_by_name; do
@@ -216,7 +217,7 @@ function find_directory {
 
   RET_FOUND=()
 
-  rmtgrep "lF" "\"visibleName\": \"${_PATH[$3]}\"" "/home/root/.local/share/remarkable/xochitl/*.metadata"
+  rmtgrep "il" "\"visibleName\": \"${_PATH[$3]}\"" "/home/root/.local/share/remarkable/xochitl/*.metadata"
   matches_by_name="$RET_MATCH"
 
   for metadata_path in $matches_by_name; do
@@ -328,7 +329,7 @@ fi
 
 # Find and pull documents
 for path in "$@"; do
-
+  echo $path
   if [ -n "$path_is_directory" ]; then
     find_directory "" "$path" 0
   else

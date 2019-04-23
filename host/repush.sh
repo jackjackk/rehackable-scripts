@@ -54,7 +54,7 @@ function usage {
 # $RET_MATCH - Match(es)
 function rmtgrep {
   escaped_regex="${2//\"/\\\"}"
-  RET_MATCH="$(ssh -S remarkable-ssh root@"$SSH_ADDRESS" "grep -$1 \"$escaped_regex\" $3")"
+  RET_MATCH="$(ssh -S remarkable-ssh root@"$SSH_ADDRESS" "/bin/grep -$1 \"$escaped_regex\" $3")"
 }
 
 # Recursively Search for a Directory
@@ -143,7 +143,23 @@ function push {
 
   # Create placeholder
   placeholder="/tmp/repush/$(basename "$1")"
-  touch "$placeholder"
+  cat <<XXX >"${placeholder}"
+%PDF-1.4
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Count 1/Kids[3 0 R]>>endobj
+3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R/Resources<<>>>>endobj
+xref
+0 4
+0000000000 65535 f 
+0000000009 00000 n 
+0000000052 00000 n 
+0000000101 00000 n 
+trailer<</Size 4/Root 1 0 R>>
+startxref
+178
+%%EOF
+XXX
+  #touch "$placeholder"
 
   while true; do
     if curl --connect-timeout 2 --silent --output /dev/null --form file=@"\"$placeholder\"" http://"$WEBUI_ADDRESS"/upload; then
@@ -313,7 +329,7 @@ if [ "$OUTPUT" ]; then
   elif [ "${#RET_FOUND[@]}" -gt 1 ]; then
     REGEX='"lastModified": "[^"]*"'
     RET_FOUND=( "${RET_FOUND[@]/#//home/root/.local/share/remarkable/xochitl/}" )
-    GREP="grep -o '$REGEX' ${RET_FOUND[@]/%/.metadata}"
+    GREP="/bin/grep -o '$REGEX' ${RET_FOUND[@]/%/.metadata}"
     match="$(ssh -S remarkable-ssh root@"$SSH_ADDRESS" "$GREP")" # Returns string that includes Metadata Path + Modification date
 
     # Sort metadata by date
@@ -352,7 +368,7 @@ if [ "$OUTPUT" ]; then
 
   # Disable wifi to prevent conflicts with cloud
   if [ -z "$REMOTE" ]; then
-    RFKILL="$(ssh -S remarkable-ssh root@"$SSH_ADDRESS" "/usr/sbin/rfkill list 0 | grep 'blocked: yes'")"
+    RFKILL="$(ssh -S remarkable-ssh root@"$SSH_ADDRESS" "/usr/sbin/rfkill list 0 | /bin/grep 'blocked: yes'")"
     if [ -z "$RFKILL" ]; then
       ssh -S remarkable-ssh root@"$SSH_ADDRESS" "/usr/sbin/rfkill block 0"
     fi
