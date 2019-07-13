@@ -55,7 +55,8 @@ function exit_failed {
 
 # $RET_MATCH - Match(es)
 function rmtgrep {
-  RET_MATCH="$(ssh -S remarkable-ssh root@"$SSH_ADDRESS" "/bin/grep -$1 '$2' $3")"
+    RET_MATCH="$(ssh -S remarkable-ssh root@"$SSH_ADDRESS" "/bin/egrep -$1 '$2' $3")"
+    echo "/bin/egrep -$1 '$2' $3: $RET_MATCH"
 }
 
 # Downloads document trough the webui
@@ -173,8 +174,10 @@ function find_document {
   IFS=$OLD_IFS
 
   RET_FOUND=()
-
-  rmtgrep "ile" "\"visibleName\": \".*${_PATH[$3]}.*\"" "/home/root/.local/share/remarkable/xochitl/*.metadata"
+  MATCH="${_PATH[$3]}"
+  [ ${MATCH: -1} == "$" ] && MATCH="${MATCH:0:-1}" || MATCH="${MATCH}.*"
+  [ ${MATCH:0:1} == "^" ] && MATCH="${MATCH:1}" || MATCH=".*${MATCH}"
+  rmtgrep "ile" "\"visibleName\": \"${MATCH}\"" "/home/root/.local/share/remarkable/xochitl/*.metadata"
   echo $RET_MATCH
   matches_by_name="$RET_MATCH"
 
