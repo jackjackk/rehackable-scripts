@@ -437,7 +437,7 @@ if [ "$REMOTE" ]; then
     exit -1
   fi
 
-  ssh -o ConnectTimeout=5 -M -S remarkable-ssh -q -f -L "$PORT":"$WEBUI_ADDRESS" root@"$SSH_ADDRESS" -N;
+  ssh -o ConnectTimeout=5 -M -S remarkable-ssh -q -f -L "$PORT":localhost:80 root@"$SSH_ADDRESS" -N;
   SSH_RET="$?"
 
   WEBUI_ADDRESS="localhost:$PORT"
